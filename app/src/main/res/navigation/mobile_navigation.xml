@@ -12,6 +12,12 @@
         tools:layout="@layout/fragment_home" />
 
     <fragment
+        android:id="@+id/navigation_scanner"
+        android:name="com.group1.scansaver.ui.scan.ScannerFragment"
+        android:label="@string/scanner"
+        tools:layout="@layout/fragment_scanner" />
+
+    <fragment
         android:id="@+id/navigation_dashboard"
         android:name="com.group1.scansaver.ui.dashboard.DashboardFragment"
         android:label="@string/title_dashboard"
