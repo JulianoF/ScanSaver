@@ -13,13 +13,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.group1.scansaver.R;
-import com.group1.scansaver.databinding.FragmentNotificationsBinding;
-import com.group1.scansaver.ui.notifications.NotificationsViewModel;
+import com.group1.scansaver.databinding.FragmentScannerBinding;
+
 
 public class ScannerFragment extends Fragment {
 
-    private FragmentNotificationsBinding binding;
+    private FragmentScannerBinding binding;
 
     public static ScannerFragment newInstance() {
         return new ScannerFragment();
@@ -32,10 +31,10 @@ public class ScannerFragment extends Fragment {
         ScannerViewModel scannerViewModel =
                 new ViewModelProvider(this).get(ScannerViewModel.class);
 
-        binding = FragmentNotificationsBinding.inflate(inflater, container, false);
+        binding = FragmentScannerBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        final TextView textView = binding.textNotifications;
+        final TextView textView = binding.textScan;
         scannerViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         return root;
     }
