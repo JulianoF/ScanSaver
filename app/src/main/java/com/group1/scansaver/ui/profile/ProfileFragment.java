@@ -1,6 +1,8 @@
 package com.group1.scansaver.ui.profile;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,17 +29,26 @@ public class ProfileFragment extends Fragment {
         binding = FragmentProfileBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        final TextView textView = binding.textProfile;
-        profileViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+        SharedPreferences preferences = getActivity().getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
+        boolean isLoggedIn = preferences.getBoolean("isLoggedIn", false);
 
-        Button testButton = binding.testButton;
-        testButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent testIntent = new Intent(getActivity(),LoginActivity.class);
-                startActivity(testIntent);
-            }
-        });
+        if (!isLoggedIn) {
+            final TextView textView = binding.textProfile;
+            profileViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+
+            Button testButton = binding.testButton;
+            testButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent testIntent = new Intent(getActivity(), LoginActivity.class);
+                    startActivity(testIntent);
+                }
+            });
+        } else {
+
+            final TextView profileTextView = binding.textProfile;
+            profileTextView.setText("Welcome to your profile!");
+        }
 
         return root;
     }

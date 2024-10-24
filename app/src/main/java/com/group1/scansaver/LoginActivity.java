@@ -1,6 +1,8 @@
 package com.group1.scansaver;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,5 +22,15 @@ public class LoginActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+    }
+
+    public void onClickForgot(View v){
+        Toast.makeText(this, "You forgot PAssword Clicked",
+                Toast.LENGTH_LONG).show();
+    }
+
+    public void onClickCreateNew(View v){
+        Toast.makeText(this, "Create New Account CLicked",
+                Toast.LENGTH_LONG).show();
     }
 }
