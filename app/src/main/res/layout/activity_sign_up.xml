@@ -13,7 +13,7 @@
         android:layout_width="180dp"
         android:layout_height="63dp"
         android:layout_marginStart="5dp"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="30dp"
         android:hint="Username"
         android:textColorHint="#A7A7A7"
         app:boxStrokeColor="#EAEAEE"
@@ -36,7 +36,7 @@
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="180dp"
         android:layout_height="63dp"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="30dp"
         android:layout_marginEnd="5dp"
         android:hint="Password"
         android:textColorHint="#A7A7A7"
@@ -62,7 +62,7 @@
         android:layout_width="180dp"
         android:layout_height="63dp"
         android:layout_marginStart="5dp"
-        android:layout_marginTop="150dp"
+        android:layout_marginTop="205dp"
         android:hint="First Name"
         android:textColorHint="#A7A7A7"
         app:boxStrokeColor="#EAEAEE"
@@ -85,7 +85,7 @@
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="180dp"
         android:layout_height="63dp"
-        android:layout_marginTop="150dp"
+        android:layout_marginTop="205dp"
         android:layout_marginEnd="5dp"
         android:hint="Last Name"
         android:textColorHint="#A7A7A7"
@@ -107,11 +107,11 @@
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/txtEmail"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        android:layout_width="373dp"
+        android:layout_width="370dp"
         android:layout_height="63dp"
-        android:layout_marginStart="5dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginEnd="5dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="10dp"
         android:hint="Email Address"
         android:textColorHint="#A7A7A7"
         app:boxStrokeColor="#EAEAEE"
@@ -130,25 +130,41 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <Button
-        android:id="@+id/login_button"
-        android:layout_width="271dp"
-        android:layout_height="55dp"
-        android:layout_marginTop="400dp"
-        android:text="LOGIN"
+        android:id="@+id/signup_button"
+        android:layout_width="180dp"
+        android:layout_height="60dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="8dp"
+        android:onClick="onClickSignUp"
+        android:text="CREATE ACCOUNT"
         android:textAlignment="center"
         android:textColor="#FFFFFF"
         android:textSize="16sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/cancelButton"
+        app:layout_constraintTop_toBottomOf="@+id/radioButton2" />
+
+    <Button
+        android:id="@+id/cancelButton"
+        android:layout_width="180dp"
+        android:layout_height="60dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="20dp"
+        android:onClick="onClickCancel"
+        android:text="CANCEL"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/signup_button"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/radioButton2" />
 
     <TextView
         android:id="@+id/titleText"
-        android:layout_width="286dp"
-        android:layout_height="66dp"
-        android:layout_marginTop="50dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100dp"
         android:text="Create An Account"
         android:textAlignment="center"
         android:textColor="#4E4E4E"
@@ -158,5 +174,17 @@
         app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <RadioButton
+        android:id="@+id/radioButton2"
+        android:layout_width="match_parent"
+        android:layout_height="57dp"
+        android:layout_marginStart="19dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="19dp"
+        android:text=" By Checking the Box You Accpet the Terms and Conditions"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtUsername" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
