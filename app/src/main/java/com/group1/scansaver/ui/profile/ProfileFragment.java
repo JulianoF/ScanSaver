@@ -14,6 +14,8 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.group1.scansaver.LoginActivity;
 import com.group1.scansaver.databinding.FragmentProfileBinding;
 
@@ -28,11 +30,9 @@ public class ProfileFragment extends Fragment {
 
         binding = FragmentProfileBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-
-        SharedPreferences preferences = getActivity().getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
-        boolean isLoggedIn = preferences.getBoolean("isLoggedIn", false);
-
-        if (!isLoggedIn) {
+        ///////////
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser == null) {
             final TextView textView = binding.textProfile;
             profileViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
 
@@ -45,10 +45,14 @@ public class ProfileFragment extends Fragment {
                 }
             });
         } else {
-
+            // User is signed in, proceed with loading fragment data or functionality
+            // You can set up your UI or load data for the signed-in user here
+            binding.mainLayout.removeView(binding.testButton);
             final TextView profileTextView = binding.textProfile;
             profileTextView.setText("Welcome to your profile!");
+
         }
+        ////////////
 
         return root;
     }
