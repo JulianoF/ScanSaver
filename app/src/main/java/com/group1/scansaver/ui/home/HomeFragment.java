@@ -34,10 +34,8 @@ public class HomeFragment extends Fragment {
             Intent intent = new Intent(getActivity(), MapActivity.class);
             startActivity(intent);
         });
-
         return root;
     }
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();
