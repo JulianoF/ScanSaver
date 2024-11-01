@@ -9,6 +9,10 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.group1.scansaver.LoginActivity;
 import com.group1.scansaver.databinding.FragmentHomeBinding;
 import com.group1.scansaver.ui.MapActivity;
 
@@ -34,6 +38,19 @@ public class HomeFragment extends Fragment {
             Intent intent = new Intent(getActivity(), MapActivity.class);
             startActivity(intent);
         });
+
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if(currentUser == null){
+            binding.logoutTest.setText("Will Be Logout When Logged In");
+        }else{
+            binding.logoutTest.setOnClickListener(v -> {
+                FirebaseAuth.getInstance().signOut();
+                Intent intent = new Intent(getActivity(), LoginActivity.class);
+                startActivity(intent);
+            });
+        }
+
+
         return root;
     }
     @Override

@@ -2,7 +2,9 @@ package com.group1.scansaver;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -12,7 +14,14 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 public class LoginActivity extends AppCompatActivity {
+
+    private FirebaseAuth auth;
+    private EditText emailInput;
+    private EditText passwordInput;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,17 +33,45 @@ public class LoginActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        auth = FirebaseAuth.getInstance();
+        emailInput = findViewById(R.id.inputUsername);
+        passwordInput = findViewById(R.id.inputPassword);
     }
 
     public void onClickForgot(View v){
-        Toast.makeText(this, "You forgot PAssword Clicked",
+        Toast.makeText(this, "You forgot Psssword Clicked",
                 Toast.LENGTH_LONG).show();
     }
 
     public void onClickCreateNew(View v){
-        Toast.makeText(this, "Create New Account CLicked",
+        Toast.makeText(this, "Create New Account Clicked",
                 Toast.LENGTH_LONG).show();
         Intent intent = new Intent(this, SignUpActivity.class);
         startActivity(intent);
+    }
+
+    public void onClickLogin(View v){
+        String email = emailInput.getText().toString().trim();
+        String password = passwordInput.getText().toString().trim();
+
+        if (email.isEmpty() || password.isEmpty()) {
+            Toast.makeText(this, "Please enter email and password", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        auth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        FirebaseUser user = auth.getCurrentUser();
+                        Toast.makeText(LoginActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
+
+                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        startActivity(intent);
+                        finish();
+                    } else {
+                        Toast.makeText(LoginActivity.this, "Authentication failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        Log.e("FIRE",task.getException().getMessage());
+                    }
+                });
     }
 }
