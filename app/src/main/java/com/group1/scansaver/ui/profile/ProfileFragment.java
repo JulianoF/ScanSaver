@@ -36,8 +36,7 @@ public class ProfileFragment extends Fragment {
             final TextView textView = binding.textProfile;
             profileViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
 
-            Button testButton = binding.testButton;
-            testButton.setOnClickListener(new View.OnClickListener() {
+            binding.testButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     Intent testIntent = new Intent(getActivity(), LoginActivity.class);
@@ -45,11 +44,16 @@ public class ProfileFragment extends Fragment {
                 }
             });
         } else {
-            // User is signed in, proceed with loading fragment data or functionality
-            // You can set up your UI or load data for the signed-in user here
-            binding.mainLayout.removeView(binding.testButton);
+
+            //binding.mainLayout.removeView(binding.testButton);
             final TextView profileTextView = binding.textProfile;
             profileTextView.setText("Welcome to your profile!");
+            binding.testButton.setText("Logout");
+            binding.testButton.setOnClickListener(v -> {
+                FirebaseAuth.getInstance().signOut();
+                Intent intent = new Intent(getActivity(), LoginActivity.class);
+                startActivity(intent);
+            });
 
         }
         ////////////

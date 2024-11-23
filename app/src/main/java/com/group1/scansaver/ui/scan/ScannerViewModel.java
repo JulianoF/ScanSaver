@@ -9,7 +9,7 @@ public class ScannerViewModel extends ViewModel {
 
     public ScannerViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("This is A Scanner fragment");
+        mText.setValue("Please Login To Scan Barcodes");
     }
 
     public LiveData<String> getText() {

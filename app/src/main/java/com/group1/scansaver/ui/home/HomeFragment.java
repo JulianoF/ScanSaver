@@ -14,7 +14,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.group1.scansaver.LoginActivity;
 import com.group1.scansaver.databinding.FragmentHomeBinding;
-import com.group1.scansaver.ui.MapActivity;
+import com.group1.scansaver.MapActivity;
 
 public class HomeFragment extends Fragment {
 
@@ -25,29 +25,16 @@ public class HomeFragment extends Fragment {
         HomeViewModel homeViewModel =
                 new ViewModelProvider(this).get(HomeViewModel.class);
 
-        // Inflate the layout using View Binding
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        // Update the text view with data from ViewModel (if needed)
-        final TextView textView = binding.textHome;
-        homeViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
-
-        // Set up the button to open MapActivity
-        binding.buttonOpenMap.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), MapActivity.class);
-            startActivity(intent);
-        });
+        final TextView homeText = binding.textHome;
 
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if(currentUser == null){
-            binding.logoutTest.setText("Will Be Logout When Logged In");
+            homeText.setText("Signed Out Home"); //WHAT YOU WANT USER TO SEE WHEN SIGNED OUT GOES HERE
         }else{
-            binding.logoutTest.setOnClickListener(v -> {
-                FirebaseAuth.getInstance().signOut();
-                Intent intent = new Intent(getActivity(), LoginActivity.class);
-                startActivity(intent);
-            });
+            homeText.setText("Signed In Home"); //WHAT YOU WANT USER TO SEE WHEN SIGNED IN GOES HERE
         }
 
 
