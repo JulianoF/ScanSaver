@@ -47,6 +47,10 @@ dependencies {
     implementation(libs.navigation.ui)
     implementation(libs.legacy.support.v4)
     implementation(libs.activity)
+    implementation(libs.camera.core)
+    implementation(libs.firebase.crashlytics.buildtools)
+    implementation(libs.camera.lifecycle)
+    implementation(libs.camera.view)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -56,5 +60,13 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.5.1"))
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
+    implementation("com.google.mlkit:barcode-scanning:17.2.0")
+    implementation ("com.google.guava:guava:31.1-android")
+    implementation ("com.squareup.okhttp3:okhttp:4.11.0")
+
+    implementation (libs.androidx.camera.core.v150)
+    implementation (libs.androidx.camera.camera2)
+    implementation (libs.androidx.camera.lifecycle.v150)
+    implementation (libs.camera.view.v150)
 
 }
