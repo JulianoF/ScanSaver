@@ -2,6 +2,7 @@ package com.group1.scansaver.ui.dashboard;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,9 +15,14 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.group1.scansaver.MapActivity;
 import com.group1.scansaver.R;
 import com.group1.scansaver.databinding.FragmentDashboardBinding;
+import com.group1.scansaver.dataobjects.Item;
 
 public class DashboardFragment extends Fragment {
 
@@ -46,33 +52,51 @@ public class DashboardFragment extends Fragment {
         binding = null;
     }
 
-    private void populateItemCards(@NonNull LayoutInflater inflater){
-
+    private void populateItemCards(@NonNull LayoutInflater inflater) {
         LinearLayout itemLayout = binding.scrollerInner;
         itemLayout.removeAllViews();
 
-        for (int i = 0; i <= 5; i++){
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            String userId = user.getUid();
 
-            View itemCard = inflater.inflate(R.layout.item_card, itemLayout, false);
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            db.collection("items")
+                    .whereEqualTo("userId", userId)
+                    .get()
+                    .addOnSuccessListener(queryDocumentSnapshots -> {
+                        for (DocumentSnapshot document : queryDocumentSnapshots) {
+                            Item item = document.toObject(Item.class);
 
-            TextView itemName = itemCard.findViewById(R.id.itemName);
-            TextView itemLowestPrice = itemCard.findViewById(R.id.itemPrice);
-            TextView itemUPC = itemCard.findViewById(R.id.upcCode);
-            ImageView itemIcon = itemCard.findViewById(R.id.imageView);
-            Button itemMapButton = itemCard.findViewById(R.id.viewOnMap);
-            Button deleteItemButton = itemCard.findViewById(R.id.deleteButton);
+                            if (item != null) {
+                                View itemCard = inflater.inflate(R.layout.item_card, itemLayout, false);
 
-            //TEST CODE WILL BE ADDED PROGRAMATICALLY
-            itemName.setText("Apples");
-            itemLowestPrice.setText("$1.99");
-            itemUPC.setText("123456789123");
+                                TextView itemName = itemCard.findViewById(R.id.itemName);
+                                TextView itemLowestPrice = itemCard.findViewById(R.id.itemPrice);
+                                TextView itemUPC = itemCard.findViewById(R.id.upcCode);
+                                ImageView itemIcon = itemCard.findViewById(R.id.imageView);
+                                Button itemMapButton = itemCard.findViewById(R.id.viewOnMap);
+                                Button deleteItemButton = itemCard.findViewById(R.id.deleteButton);
 
-            itemMapButton.setOnClickListener(v -> {
-                Intent intent = new Intent(getActivity(), MapActivity.class);
-                startActivity(intent);
-            });
+                                itemName.setText(item.getNAME());
+                                itemLowestPrice.setText("$" + item.getPRICE());
+                                itemUPC.setText(item.getUPC());
 
-            itemLayout.addView(itemCard);
+                                itemMapButton.setOnClickListener(v -> {
+                                    Intent intent = new Intent(getActivity(), MapActivity.class);// START MAP ACTIVITY SEND GEO DATA TO IT
+                                    startActivity(intent);
+                                });
+
+                                itemLayout.addView(itemCard);
+                            }
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e("Firestore", "Error getting items", e);
+                    });
+        } else {
+            Log.w("Auth", "No user is currently signed in.");
         }
     }
+
 }
