@@ -21,6 +21,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.util.Size;
@@ -41,8 +43,11 @@ import com.google.mlkit.vision.barcode.BarcodeScanning;
 import com.google.mlkit.vision.barcode.common.Barcode;
 import com.google.mlkit.vision.common.InputImage;
 import com.group1.scansaver.api.UPCApiRequest;
+import com.group1.scansaver.databasehelpers.FirestoreHandler;
 import com.group1.scansaver.databinding.FragmentScannerBinding;
+import com.group1.scansaver.dataobjects.Item;
 
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -53,7 +58,10 @@ public class ScannerFragment extends Fragment {
 
     private ExecutorService cameraExecutor;
 
+    private boolean isProcessingBarcode = false;
     private String scanResult;
+
+    private FirestoreHandler fs;
 
     private static final int CAMERA_REQUEST_CODE = 100;
 
@@ -79,6 +87,7 @@ public class ScannerFragment extends Fragment {
             binding.previewView.setVisibility(View.GONE);
         }else{
             checkCameraPermission();
+            fs = new FirestoreHandler();
             binding.previewView.setVisibility(View.VISIBLE);
         }
 
@@ -176,6 +185,10 @@ public class ScannerFragment extends Fragment {
 
     private void analyzeImage(@NonNull ImageProxy imageProxy) {
 
+        if (isProcessingBarcode) {
+            imageProxy.close();
+            return;
+        }
 
         @SuppressWarnings("UnsafeOptInUsageError")
         InputImage image = InputImage.fromMediaImage(
@@ -192,10 +205,16 @@ public class ScannerFragment extends Fragment {
                 .process(image)
                 .addOnSuccessListener(barcodes -> {
                     for (Barcode barcode : barcodes) {
+                        isProcessingBarcode = true;
                         String rawValue = barcode.getRawValue();
                         scanResult = rawValue;
                         vibratePhone();
                         handleScannedBarcode(rawValue);
+
+                        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                            isProcessingBarcode = false;
+                        }, 2000);
+
                         break;
                     }
                 })
@@ -226,21 +245,26 @@ public class ScannerFragment extends Fragment {
         Toast.makeText(getContext(), "Scanned: " + barcode, Toast.LENGTH_SHORT).show();
 
         // NOT WORKING YET ATTEMPT TO HIT UPC API BELOW
-       /* UPCApiRequest apiRequest = new UPCApiRequest();
+        UPCApiRequest apiRequest = new UPCApiRequest();
         apiRequest.fetchProductDetails(barcode, new UPCApiRequest.UPCApiResponseCallback() {
             @Override
-            public void onSuccess(String barcodeAPI, String title, String msrp, String stores) {
+            public void onSuccess(String barcodeAPI, String title, String msrp, List<List<String>>  stores) {
                 requireActivity().runOnUiThread(() -> {
-                    Toast.makeText(getContext(), "Barcode: " + barcodeAPI, Toast.LENGTH_SHORT).show();
                     Toast.makeText(getContext(), "Title: " + title, Toast.LENGTH_SHORT).show();
                     Toast.makeText(getContext(), "MSRP: " + msrp, Toast.LENGTH_SHORT).show();
-                    Toast.makeText(getContext(), "Stores: " + stores, Toast.LENGTH_SHORT).show();
-                    textView.setText(
-                        "Barcode: " + barcode + "\n" +
-                                "Title: " + title + "\n" +
-                                "MSRP: $" + msrp + "\n" +
-                                "Stores:\n" + stores
-                        );
+
+                    try{
+                        Item newItem = new Item(title,barcodeAPI,Double.parseDouble(msrp),stores);
+                        fs.insertItemIntoFirestore(newItem);
+                    }catch(Exception e){
+                        Toast.makeText(getContext(), "ITEM NOT FOUND IN API but barcode is:"+barcode, Toast.LENGTH_SHORT).show();
+                        // HERE WE SHOULD START ACTiVITY TO ADD AN ITEM
+                        ///////////////////////////////
+                        // Intent intent = new Intent(getContext(), BarcodeResultActivity.class);
+                        // intent.putExtra("SCANNED_BARCODE", barcode);
+                        //startActivity(intent);
+                    }
+
                 });
             }
             @Override
@@ -249,11 +273,8 @@ public class ScannerFragment extends Fragment {
 
                 });
             }
-        });  */
+        });
 
-       // Intent intent = new Intent(getContext(), BarcodeResultActivity.class);
-       // intent.putExtra("SCANNED_BARCODE", barcode);
-        //startActivity(intent);
     }
 
 }

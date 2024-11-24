@@ -1,11 +1,14 @@
 package com.group1.scansaver.dataobjects;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Item {
 
     private String ITEM_UPC;
     private String ITEM_NAME;
     private double ITEM_PRICE;
-    private String[] ITEM_LOCATION_ARRAY;
+    private List<List<String>> ITEM_LOCATION_ARRAY;
 
     public Item() {
         this.ITEM_UPC = null;
@@ -17,9 +20,9 @@ public class Item {
         this.ITEM_UPC = upc;
         this.ITEM_NAME = name;
         this.ITEM_PRICE = price;
-        this.ITEM_LOCATION_ARRAY = null;
+        this.ITEM_LOCATION_ARRAY = new ArrayList<>();
     }
-    public Item(String name, String upc, double price, String[] locArray) {
+    public Item(String name, String upc, double price, List<List<String>> locArray) {
         this.ITEM_UPC = upc;
         this.ITEM_NAME = name;
         this.ITEM_PRICE = price;
@@ -50,11 +53,11 @@ public class Item {
         this.ITEM_PRICE = ITEM_PRICE;
     }
 
-    public String[] getITEM_LOCATION_ARRAY() {
+    public List<List<String>> getITEM_LOCATION_ARRAY() {
         return ITEM_LOCATION_ARRAY;
     }
 
-    public void setITEM_LOCATION_ARRAY(String[] ITEM_LOCATION_ARRAY) {
+    public void setITEM_LOCATION_ARRAY(List<List<String>> ITEM_LOCATION_ARRAY) {
         this.ITEM_LOCATION_ARRAY = ITEM_LOCATION_ARRAY;
     }
 }
