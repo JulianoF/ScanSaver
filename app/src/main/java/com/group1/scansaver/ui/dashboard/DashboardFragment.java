@@ -17,10 +17,12 @@ import androidx.lifecycle.ViewModelProvider;
 import com.group1.scansaver.MapActivity;
 import com.group1.scansaver.R;
 import com.group1.scansaver.databinding.FragmentDashboardBinding;
+import com.group1.scansaver.AddItemActivity;
 
 public class DashboardFragment extends Fragment {
 
     private FragmentDashboardBinding binding;
+    private Button addItemButton;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -33,6 +35,11 @@ public class DashboardFragment extends Fragment {
         final TextView textView = binding.textDashboard;
         dashboardViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
 
+        addItemButton = root.findViewById(R.id.addNewItemButton);
+        addItemButton.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), AddItemActivity.class);
+            startActivity(intent);
+        });
 
         populateItemCards(inflater);
         ///////
@@ -67,9 +74,14 @@ public class DashboardFragment extends Fragment {
             itemLowestPrice.setText("$1.99");
             itemUPC.setText("123456789123");
 
+
             itemMapButton.setOnClickListener(v -> {
                 Intent intent = new Intent(getActivity(), MapActivity.class);
                 startActivity(intent);
+            });
+
+            deleteItemButton.setOnClickListener(v -> {
+                itemLayout.removeView(itemCard);
             });
 
             itemLayout.addView(itemCard);
