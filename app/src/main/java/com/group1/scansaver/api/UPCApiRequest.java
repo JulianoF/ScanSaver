@@ -10,11 +10,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UPCApiRequest {
 
     public interface UPCApiResponseCallback {
-        void onSuccess(String barcode, String title, String msrp, String stores);
+        void onSuccess(String barcode, String title, String msrp, List<List<String>>  stores);
         void onError(String error);
     }
 
@@ -29,11 +31,11 @@ public class UPCApiRequest {
         OkHttpClient client = new OkHttpClient();
 
         // NOT REAL KEY, KEY MUST GO IN SAFE SPACE
-        String API_KEY = ""; // API KEY
+        String API_KEY = "NOTAVALIDKEY"; // API KEY
 
         Request request = new Request.Builder()
-                .url(API_URL)
-                .addHeader("Authorization", "Bearer " + API_KEY)
+                .url(API_URL+"?apikey="+API_KEY)
+                //.addHeader("Authorization", "Bearer " + API_KEY)
                 .build();
 
         new Thread(() -> {
@@ -46,14 +48,12 @@ public class UPCApiRequest {
                     String errorBody = response.body().string();
                     callback.onError("Request failed with code: " + response.code() + ", body: " + errorBody);
                     Log.e("API", "FAILURE-API: " + response.code() + ", Body: " + errorBody);
+                    //CAN HANDLE INVALID UPCS HERE
                 }
                 //LOGGING BELOW
             } catch (IOException e) {
                 Log.e("API", "IOException occurred: " + e.getMessage());
                 callback.onError("IOException: " + e.getMessage());
-            } catch (JSONException e) {
-                Log.e("API", "JSONException occurred: " + e.getMessage());
-                callback.onError("JSONException: " + e.getMessage());
             } catch (Exception e) {
                 Log.e("API", "Unexpected Exception: " + e.getMessage());
                 callback.onError("Unexpected error: " + e.getMessage());
@@ -61,24 +61,46 @@ public class UPCApiRequest {
         }).start();
     }
 
-    private void parseResponse(String responseBody, UPCApiResponseCallback callback) throws JSONException {
-        JSONObject jsonResponse = new JSONObject(responseBody);
-
-        String barcode = jsonResponse.optString("barcode", "N/A");
-        String title = jsonResponse.optString("title", "N/A");
-        String msrp = jsonResponse.optString("msrp", "N/A");
-
-        JSONArray storesArray = jsonResponse.optJSONArray("stores");
-        StringBuilder storesBuilder = new StringBuilder();
-        if (storesArray != null) {
-            for (int i = 0; i < storesArray.length(); i++) {
-                JSONObject storeObject = storesArray.getJSONObject(i);
-                String storeName = storeObject.optString("store", "Unknown Store");
-                String storePrice = storeObject.optString("price", "N/A");
-                storesBuilder.append(storeName).append(" - $").append(storePrice).append("\n");
+    private void parseResponse(String responseBody, UPCApiResponseCallback callback) {
+        try {
+            if (!responseBody.trim().startsWith("{")) {
+                int jsonStart = responseBody.indexOf("{");
+                if (jsonStart != -1) {
+                    responseBody = responseBody.substring(jsonStart);
+                } else {
+                    throw new JSONException("No valid JSON found in response.");
+                }
             }
+
+            JSONObject jsonResponse = new JSONObject(responseBody);
+
+            String barcode = jsonResponse.optString("barcode", "N/A");
+            String title = jsonResponse.optString("title", "N/A");
+            String msrp = jsonResponse.optString("msrp", "N/A");
+
+            JSONArray storesArray = jsonResponse.optJSONArray("stores");
+            List<List<String>> storesData = new ArrayList<>();
+
+            if (storesArray != null) {
+                for (int i = 0; i < storesArray.length(); i++) {
+                    JSONObject storeObject = storesArray.getJSONObject(i);
+
+                    String storeName = storeObject.optString("store", "Unknown Store");
+                    String storePrice = storeObject.optString("price", "N/A");
+
+                    List<String> storeEntry = new ArrayList<>();
+                    storeEntry.add(storeName);
+                    storeEntry.add(storePrice);
+                    storesData.add(storeEntry);
+                }
+            }
+
+            callback.onSuccess(barcode, title, msrp, storesData);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            callback.onError("Failed to parse response: " + e.getMessage());
         }
-        callback.onSuccess(barcode, title, msrp, storesBuilder.toString());
     }
+
 }
 
