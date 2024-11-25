@@ -31,7 +31,7 @@ public class UPCApiRequest {
         OkHttpClient client = new OkHttpClient();
 
         // NOT REAL KEY, KEY MUST GO IN SAFE SPACE
-        String API_KEY = "18614A16819D1B04A4DCBCC1D3B2DA18"; // API KEY
+        String API_KEY = ""; // API KEY
 
         Request request = new Request.Builder()
                 .url(API_URL+"?apikey="+API_KEY)
