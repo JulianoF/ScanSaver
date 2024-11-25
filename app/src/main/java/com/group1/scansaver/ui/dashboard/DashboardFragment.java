@@ -22,11 +22,16 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.group1.scansaver.MapActivity;
 import com.group1.scansaver.R;
 import com.group1.scansaver.databinding.FragmentDashboardBinding;
+
+import com.group1.scansaver.AddItemActivity;
+
 import com.group1.scansaver.dataobjects.Item;
+
 
 public class DashboardFragment extends Fragment {
 
     private FragmentDashboardBinding binding;
+    private Button addItemButton;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -39,6 +44,11 @@ public class DashboardFragment extends Fragment {
         final TextView textView = binding.textDashboard;
         dashboardViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
 
+        addItemButton = root.findViewById(R.id.addNewItemButton);
+        addItemButton.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), AddItemActivity.class);
+            startActivity(intent);
+        });
 
         populateItemCards(inflater);
         ///////
