@@ -126,7 +126,8 @@ public class DashboardFragment extends Fragment {
 
 
                                 itemMapButton.setOnClickListener(v -> {
-                                    Intent intent = new Intent(getActivity(), MapActivity.class);// START MAP ACTIVITY SEND GEO DATA TO IT
+
+                                    Intent intent = new Intent(getActivity(), MapActivity.class); // START MAP ACTIVITY SEND GEO DATA TO IT
 
                                     startActivity(intent);
                                 });
@@ -142,7 +143,4 @@ public class DashboardFragment extends Fragment {
             Log.w("Auth", "No user is currently signed in.");
         }
     }
-
-
-
 }

@@ -50,7 +50,6 @@ public class AddItemActivity extends AppCompatActivity {
                 Toast.makeText(this, "Please fill in all fields.", Toast.LENGTH_SHORT).show();
             } else {
                 try {
-                    double itemPrice = Double.parseDouble(itemPriceStr);
                     saveItemToDatabase();
                     Toast.makeText(this, "Item Added: " + itemName, Toast.LENGTH_SHORT).show();
                     finish();
