@@ -42,6 +42,7 @@ import com.google.mlkit.vision.barcode.BarcodeScannerOptions;
 import com.google.mlkit.vision.barcode.BarcodeScanning;
 import com.google.mlkit.vision.barcode.common.Barcode;
 import com.google.mlkit.vision.common.InputImage;
+import com.group1.scansaver.AddItemActivity;
 import com.group1.scansaver.api.UPCApiRequest;
 import com.group1.scansaver.databasehelpers.FirestoreHandler;
 import com.group1.scansaver.databinding.FragmentScannerBinding;
@@ -248,21 +249,22 @@ public class ScannerFragment extends Fragment {
         UPCApiRequest apiRequest = new UPCApiRequest();
         apiRequest.fetchProductDetails(barcode, new UPCApiRequest.UPCApiResponseCallback() {
             @Override
-            public void onSuccess(String barcodeAPI, String title, String msrp, List<List<String>>  stores) {
+            public void onSuccess(String barcodeAPI, String title, String msrp, String store, String imgURL) {
                 requireActivity().runOnUiThread(() -> {
                     Toast.makeText(getContext(), "Title: " + title, Toast.LENGTH_SHORT).show();
                     Toast.makeText(getContext(), "MSRP: " + msrp, Toast.LENGTH_SHORT).show();
 
                     try{
-                        Item newItem = new Item(title,barcodeAPI,Double.parseDouble(msrp),stores);
+                        Item newItem = new Item(title,barcodeAPI,Double.parseDouble(msrp),store,imgURL);
                         fs.insertItemIntoFirestore(newItem);
                     }catch(Exception e){
                         Toast.makeText(getContext(), "ITEM NOT FOUND IN API but barcode is:"+barcode, Toast.LENGTH_SHORT).show();
                         // HERE WE SHOULD START ACTiVITY TO ADD AN ITEM
                         ///////////////////////////////
-                        // Intent intent = new Intent(getContext(), BarcodeResultActivity.class);
-                        // intent.putExtra("SCANNED_BARCODE", barcode);
-                        //startActivity(intent);
+                        Intent intent = new Intent(getActivity(), AddItemActivity.class);
+                        intent.putExtra("SCANNED_BARCODE", barcode);
+                        startActivity(intent);
+
                     }
 
                 });

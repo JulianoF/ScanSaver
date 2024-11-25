@@ -31,6 +31,14 @@ public class AddItemActivity extends AppCompatActivity {
         buttonBack = findViewById(R.id.buttonBack);
         buttonSubmit = findViewById(R.id.buttonSubmit);
 
+        Intent intent = getIntent();
+        String barcode = intent.getStringExtra("SCANNED_BARCODE");
+        if(barcode.isEmpty()){
+            barcode = "000000000000";
+        }else{
+            inputUPC.setText(barcode);
+        }
+        
         buttonBack.setOnClickListener(v -> finish()); // Finishes the current activity and goes back
 
         buttonSubmit.setOnClickListener(v -> {
@@ -58,6 +66,6 @@ public class AddItemActivity extends AppCompatActivity {
 
         FirestoreHandler database = new FirestoreHandler();
         //UNCOMMENT THIS FOR ITEMS TO BE SAVED TO DB
-        //database.insertItemIntoFirestore(savedItem);
+        database.insertItemIntoFirestore(savedItem);
     }
 }

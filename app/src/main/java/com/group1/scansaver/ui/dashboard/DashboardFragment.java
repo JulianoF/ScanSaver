@@ -1,6 +1,8 @@
 package com.group1.scansaver.ui.dashboard;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -27,11 +29,19 @@ import com.group1.scansaver.AddItemActivity;
 
 import com.group1.scansaver.dataobjects.Item;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 
 public class DashboardFragment extends Fragment {
 
     private FragmentDashboardBinding binding;
     private Button addItemButton;
+    private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -92,8 +102,32 @@ public class DashboardFragment extends Fragment {
                                 itemLowestPrice.setText("$" + item.getPRICE());
                                 itemUPC.setText(item.getUPC());
 
+                                String imgURL = item.getITEM_IMAGEURL();
+
+                                if(imgURL != null){
+                                    if(!imgURL.isEmpty()|| imgURL.compareTo("N/A") != 0){
+
+                                        executorService.execute(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                try {
+                                                    Bitmap bitmap = BitmapFactory.decodeStream((InputStream)new URL(item.getITEM_IMAGEURL()).getContent());
+                                                    itemIcon.setImageBitmap(bitmap);
+                                                } catch (MalformedURLException e) {
+                                                    Log.e("IMGURL",e.getMessage());
+                                                } catch (IOException e) {
+                                                    Log.e("IMGURL",e.getMessage());
+                                                }
+                                            }
+
+                                        });
+                                    }
+                                }else{Log.e("IMGURL","NULL URL");}
+
+
                                 itemMapButton.setOnClickListener(v -> {
                                     Intent intent = new Intent(getActivity(), MapActivity.class);// START MAP ACTIVITY SEND GEO DATA TO IT
+
                                     startActivity(intent);
                                 });
 
@@ -108,5 +142,7 @@ public class DashboardFragment extends Fragment {
             Log.w("Auth", "No user is currently signed in.");
         }
     }
+
+
 
 }

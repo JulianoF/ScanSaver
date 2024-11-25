@@ -16,7 +16,7 @@ import java.util.List;
 public class UPCApiRequest {
 
     public interface UPCApiResponseCallback {
-        void onSuccess(String barcode, String title, String msrp, List<List<String>>  stores);
+        void onSuccess(String barcode, String title, String msrp, String stores, String imgUrl);
         void onError(String error);
     }
 
@@ -31,7 +31,7 @@ public class UPCApiRequest {
         OkHttpClient client = new OkHttpClient();
 
         // NOT REAL KEY, KEY MUST GO IN SAFE SPACE
-        String API_KEY = "NOTAVALIDKEY"; // API KEY
+        String API_KEY = ""; // API KEY
 
         Request request = new Request.Builder()
                 .url(API_URL+"?apikey="+API_KEY)
@@ -77,25 +77,24 @@ public class UPCApiRequest {
             String barcode = jsonResponse.optString("barcode", "N/A");
             String title = jsonResponse.optString("title", "N/A");
             String msrp = jsonResponse.optString("msrp", "N/A");
+            String store = "";
+            String imageURL = "";
 
-            JSONArray storesArray = jsonResponse.optJSONArray("stores");
-            List<List<String>> storesData = new ArrayList<>();
+            if(!jsonResponse.optString("metadata").isEmpty()){
+               try{
+                   JSONObject meta = new JSONObject(jsonResponse.optString("metadata"));
+                   store = meta.optString("stores","N/A");
+                   imageURL = meta.optString("images","N/A");
+               }catch(Exception e){
+                 // If needed do something here
+               }
 
-            if (storesArray != null) {
-                for (int i = 0; i < storesArray.length(); i++) {
-                    JSONObject storeObject = storesArray.getJSONObject(i);
-
-                    String storeName = storeObject.optString("store", "Unknown Store");
-                    String storePrice = storeObject.optString("price", "N/A");
-
-                    List<String> storeEntry = new ArrayList<>();
-                    storeEntry.add(storeName);
-                    storeEntry.add(storePrice);
-                    storesData.add(storeEntry);
-                }
             }
 
-            callback.onSuccess(barcode, title, msrp, storesData);
+            Log.e("API", "store value:"+store);
+            Log.e("API", "url value:"+imageURL);
+
+            callback.onSuccess(barcode, title, msrp, store, imageURL);
         } catch (JSONException e) {
             e.printStackTrace();
             callback.onError("Failed to parse response: " + e.getMessage());
@@ -160,17 +159,6 @@ public class UPCApiRequest {
         double maxLon = lon + lonOffset;
 
         return new double[]{minLat, maxLat, minLon, maxLon};
-    }
-
-    public static double haversine(double lat1, double lon1, double lat2, double lon2) {
-        final int R = 6371; // Radius of the Earth in km
-        double dLat = Math.toRadians(lat2 - lat1);
-        double dLon = Math.toRadians(lon2 - lon1);
-        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
-                        Math.sin(dLon / 2) * Math.sin(dLon / 2);
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return R * c; // Distance in km
     }
 
 }
