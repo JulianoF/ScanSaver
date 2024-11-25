@@ -23,6 +23,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.group1.scansaver.LoginActivity;
 import com.group1.scansaver.MapActivity;
 import com.group1.scansaver.R;
 import com.group1.scansaver.databasehelpers.FirestoreHandler;
@@ -37,6 +38,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -47,6 +49,7 @@ public class DashboardFragment extends Fragment {
     private Button addItemButton;
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         DashboardViewModel dashboardViewModel =
@@ -54,17 +57,30 @@ public class DashboardFragment extends Fragment {
 
         binding = FragmentDashboardBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-
         final TextView textView = binding.textDashboard;
-        dashboardViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
 
-        addItemButton = root.findViewById(R.id.addNewItemButton);
-        addItemButton.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), AddItemActivity.class);
-            startActivity(intent);
-        });
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser == null) {
+            textView.setText("Login to Retrive Scanned History");
+            LinearLayout itemLayout = binding.scrollerInner;
+            itemLayout.removeAllViews();
+            addItemButton = root.findViewById(R.id.addNewItemButton);
+            addItemButton.setVisibility(View.GONE);
+        } else {
 
-        populateItemCards(inflater);
+            dashboardViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+
+            addItemButton = root.findViewById(R.id.addNewItemButton);
+            addItemButton.setOnClickListener(v -> {
+                Intent intent = new Intent(getActivity(), AddItemActivity.class);
+                intent.putExtra("SCANNED_BARCODE", "");
+                startActivity(intent);
+            });
+
+            populateItemCards(inflater);
+        }
+
+
         ///////
 
         return root;
@@ -118,7 +134,7 @@ public class DashboardFragment extends Fragment {
                                             public void run() {
                                                 try {
                                                     Bitmap bitmap = BitmapFactory.decodeStream((InputStream)new URL(item.getITEM_IMAGEURL()).getContent());
-                                                    itemIcon.setImageBitmap(bitmap);
+                                                    requireActivity().runOnUiThread(() -> itemIcon.setImageBitmap(bitmap));
                                                 } catch (MalformedURLException e) {
                                                     Log.e("IMGURL",e.getMessage());
                                                 } catch (IOException e) {

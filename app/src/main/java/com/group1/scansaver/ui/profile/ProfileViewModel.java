@@ -10,7 +10,7 @@ public class ProfileViewModel extends ViewModel {
 
     public ProfileViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("Profile Before Logging In");
+        mText.setValue("You Must Login To View Your Profile");
     }
 
     public LiveData<String> getText() {
