@@ -25,6 +25,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.util.Log;
 import android.util.Size;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,6 +33,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -42,6 +44,8 @@ import com.google.mlkit.vision.barcode.BarcodeScannerOptions;
 import com.google.mlkit.vision.barcode.BarcodeScanning;
 import com.google.mlkit.vision.barcode.common.Barcode;
 import com.google.mlkit.vision.common.InputImage;
+import com.group1.scansaver.AddItemActivity;
+import com.group1.scansaver.R;
 import com.group1.scansaver.api.UPCApiRequest;
 import com.group1.scansaver.databasehelpers.FirestoreHandler;
 import com.group1.scansaver.databinding.FragmentScannerBinding;
@@ -221,7 +225,6 @@ public class ScannerFragment extends Fragment {
                 .addOnFailureListener(e -> e.printStackTrace())
                 .addOnCompleteListener(task -> {
                     imageProxy.close();
-                    //Toast.makeText(getContext(), "Scanned: " + scanResult, Toast.LENGTH_SHORT).show();
                 });
     }
 
@@ -244,34 +247,48 @@ public class ScannerFragment extends Fragment {
 
         Toast.makeText(getContext(), "Scanned: " + barcode, Toast.LENGTH_SHORT).show();
 
-        // NOT WORKING YET ATTEMPT TO HIT UPC API BELOW
         UPCApiRequest apiRequest = new UPCApiRequest();
         apiRequest.fetchProductDetails(barcode, new UPCApiRequest.UPCApiResponseCallback() {
             @Override
-            public void onSuccess(String barcodeAPI, String title, String msrp, List<List<String>>  stores) {
+            public void onSuccess(String barcodeAPI, String title, String msrp, String store, String imgURL) {
                 requireActivity().runOnUiThread(() -> {
                     Toast.makeText(getContext(), "Title: " + title, Toast.LENGTH_SHORT).show();
                     Toast.makeText(getContext(), "MSRP: " + msrp, Toast.LENGTH_SHORT).show();
 
                     try{
-                        Item newItem = new Item(title,barcodeAPI,Double.parseDouble(msrp),stores);
+                        Item newItem = new Item(title,barcodeAPI,Double.parseDouble(msrp),store,imgURL);
                         fs.insertItemIntoFirestore(newItem);
+
+                        //BottomNavigationView bottomNavigationView = getActivity().findViewById(R.id.nav_view);///////////////
+                        //bottomNavigationView.setSelectedItemId(R.id.navigation_dashboard);
+
                     }catch(Exception e){
                         Toast.makeText(getContext(), "ITEM NOT FOUND IN API but barcode is:"+barcode, Toast.LENGTH_SHORT).show();
-                        // HERE WE SHOULD START ACTiVITY TO ADD AN ITEM
-                        ///////////////////////////////
-                        // Intent intent = new Intent(getContext(), BarcodeResultActivity.class);
-                        // intent.putExtra("SCANNED_BARCODE", barcode);
-                        //startActivity(intent);
+                        new Thread(() -> {
+                            boolean exists = fs.doesItemExist(barcode);
+                            if (exists) {
+                                Log.d("ITEM_CHECK", "Item exists in Firestore.");
+
+                               // BottomNavigationView bottomNavigationView = getActivity().findViewById(R.id.nav_view);///////////////
+                                //bottomNavigationView.setSelectedItemId(R.id.navigation_dashboard);
+
+                            } else {
+                                Log.d("ITEM_CHECK", "Item does not exist in Firestore.");
+                                Intent intent = new Intent(getActivity(), AddItemActivity.class);
+                                intent.putExtra("SCANNED_BARCODE", barcode);
+                                startActivity(intent);
+                            }
+                        }).start();
+
                     }
 
                 });
             }
             @Override
             public void onError(String error) {
-                requireActivity().runOnUiThread(() -> {
+                //requireActivity().runOnUiThread(() -> {
 
-                });
+                //});
             }
         });
 

@@ -65,6 +65,36 @@
         android:hint="Enter price"
         android:inputType="numberDecimal" />
 
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="16dp"
+        android:paddingBottom="4dp"
+        android:text="Store Name"
+        android:textSize="16sp" />
+
+    <EditText
+        android:id="@+id/inputStoreName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter Store Name" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="16dp"
+        android:paddingBottom="4dp"
+        android:text="Image URL"
+        android:textSize="16sp" />
+
+    <EditText
+        android:id="@+id/inputURL"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Paste Image URL" />
+
     <Button
         android:id="@+id/buttonSubmit"
         android:layout_width="match_parent"

@@ -51,6 +51,7 @@ dependencies {
     implementation(libs.firebase.crashlytics.buildtools)
     implementation(libs.camera.lifecycle)
     implementation(libs.camera.view)
+    implementation(libs.play.services.location)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

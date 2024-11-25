@@ -8,25 +8,36 @@ public class Item {
     private String ITEM_UPC;
     private String ITEM_NAME;
     private double ITEM_PRICE;
-    private List<List<String>> ITEM_LOCATION_ARRAY;
+    private String ITEM_LOCATION;
+    private String ITEM_IMAGEURL;
 
     public Item() {
         this.ITEM_UPC = null;
         this.ITEM_NAME = null;
         this.ITEM_PRICE = 0.00;
-        this.ITEM_LOCATION_ARRAY = null;
+        this.ITEM_LOCATION = null;
+        this.ITEM_IMAGEURL = null;
     }
     public Item(String name, String upc, double price) {
         this.ITEM_UPC = upc;
         this.ITEM_NAME = name;
         this.ITEM_PRICE = price;
-        this.ITEM_LOCATION_ARRAY = new ArrayList<>();
+        this.ITEM_LOCATION = null;
+        this.ITEM_IMAGEURL = null;
     }
-    public Item(String name, String upc, double price, List<List<String>> locArray) {
+    public Item(String name, String upc, double price, String loc) {
         this.ITEM_UPC = upc;
         this.ITEM_NAME = name;
         this.ITEM_PRICE = price;
-        this.ITEM_LOCATION_ARRAY = locArray;
+        this.ITEM_LOCATION = loc;
+        this.ITEM_IMAGEURL = null;
+    }
+    public Item(String name, String upc, double price, String loc, String imgUrl) {
+        this.ITEM_UPC = upc;
+        this.ITEM_NAME = name;
+        this.ITEM_PRICE = price;
+        this.ITEM_LOCATION = loc;
+        this.ITEM_IMAGEURL = imgUrl;
     }
 
     public String getUPC() {
@@ -53,12 +64,20 @@ public class Item {
         this.ITEM_PRICE = ITEM_PRICE;
     }
 
-    public List<List<String>> getITEM_LOCATION_ARRAY() {
-        return ITEM_LOCATION_ARRAY;
+    public String getITEM_LOCATION() {
+        return ITEM_LOCATION;
     }
 
-    public void setITEM_LOCATION_ARRAY(List<List<String>> ITEM_LOCATION_ARRAY) {
-        this.ITEM_LOCATION_ARRAY = ITEM_LOCATION_ARRAY;
+    public void setITEM_LOCATION(String ITEM_LOCATION) {
+        this.ITEM_LOCATION = ITEM_LOCATION;
+    }
+
+    public String getITEM_IMAGEURL(){
+        return this.ITEM_IMAGEURL;
+    }
+
+    public void setITEM_IMAGEURL(String ITEM_IMAGEURL){
+        this.ITEM_IMAGEURL= ITEM_IMAGEURL;
     }
 }
 

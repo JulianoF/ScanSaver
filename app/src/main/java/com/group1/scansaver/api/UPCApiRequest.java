@@ -16,7 +16,7 @@ import java.util.List;
 public class UPCApiRequest {
 
     public interface UPCApiResponseCallback {
-        void onSuccess(String barcode, String title, String msrp, List<List<String>>  stores);
+        void onSuccess(String barcode, String title, String msrp, String stores, String imgUrl);
         void onError(String error);
     }
 
@@ -31,7 +31,7 @@ public class UPCApiRequest {
         OkHttpClient client = new OkHttpClient();
 
         // NOT REAL KEY, KEY MUST GO IN SAFE SPACE
-        String API_KEY = "NOTAVALIDKEY"; // API KEY
+        String API_KEY = ""; // API KEY
 
         Request request = new Request.Builder()
                 .url(API_URL+"?apikey="+API_KEY)
@@ -77,29 +77,88 @@ public class UPCApiRequest {
             String barcode = jsonResponse.optString("barcode", "N/A");
             String title = jsonResponse.optString("title", "N/A");
             String msrp = jsonResponse.optString("msrp", "N/A");
+            String store = "";
+            String imageURL = "";
 
-            JSONArray storesArray = jsonResponse.optJSONArray("stores");
-            List<List<String>> storesData = new ArrayList<>();
+            if(!jsonResponse.optString("metadata").isEmpty()){
+               try{
+                   JSONObject meta = new JSONObject(jsonResponse.optString("metadata"));
+                   store = meta.optString("stores","N/A");
+                   imageURL = meta.optString("images","N/A");
+               }catch(Exception e){
+                 // If needed do something here
+               }
 
-            if (storesArray != null) {
-                for (int i = 0; i < storesArray.length(); i++) {
-                    JSONObject storeObject = storesArray.getJSONObject(i);
-
-                    String storeName = storeObject.optString("store", "Unknown Store");
-                    String storePrice = storeObject.optString("price", "N/A");
-
-                    List<String> storeEntry = new ArrayList<>();
-                    storeEntry.add(storeName);
-                    storeEntry.add(storePrice);
-                    storesData.add(storeEntry);
-                }
             }
 
-            callback.onSuccess(barcode, title, msrp, storesData);
+            Log.e("API", "store value:"+store);
+            Log.e("API", "url value:"+imageURL);
+
+            callback.onSuccess(barcode, title, msrp, store, imageURL);
         } catch (JSONException e) {
             e.printStackTrace();
             callback.onError("Failed to parse response: " + e.getMessage());
         }
+    }
+
+    public List<double[]> getStoreLocations(String storeName, double userLat, double userLong) {
+        List<double[]> results = new ArrayList<>();
+        OkHttpClient client = new OkHttpClient();
+
+        double radiusKm = 20.0;
+
+        Log.e("API", "UserLat: "+userLat+" UserLong: "+userLong);
+        // Calculate the bounding box
+        double[] boundingBox = calculateBoundingBox(userLat, userLong, radiusKm);
+        String viewbox = boundingBox[0] + "," + boundingBox[1] + "," + boundingBox[2] + "," + boundingBox[3];
+
+        String bounded = "1"; // Limit results to the specified bounding box
+        String countryCode = "ca"; // Canada
+
+        String url = "https://nominatim.openstreetmap.org/search?q=" + storeName +
+                "&format=json&addressdetails=1&viewbox=" + viewbox + "&bounded=" + bounded +
+                "&lat=" + userLat + "&lon=" + userLong +
+                "&countrycodes=" + countryCode;
+
+        Request request = new Request.Builder()
+                .url(url)
+                .addHeader("User-Agent", "ScanSaver/1.0 (juliano1@live.ca)")
+                .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            if (response.isSuccessful()) {
+                String jsonData = response.body().string();
+                Log.e("API Response", jsonData);
+                JSONArray jsonArray = new JSONArray(jsonData);
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject location = jsonArray.getJSONObject(i);
+                    double latitude = location.getDouble("lat");
+                    double longitude = location.getDouble("lon");
+
+                    results.add(new double[]{latitude, longitude});
+                }
+            } else {
+                Log.e("API", "Failed API call");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return results;
+    }
+
+
+    private double[] calculateBoundingBox(double lat, double lon, double radiusKm) {
+        final double earthRadiusKm = 6371.1370;
+
+        double latOffset = Math.toDegrees(radiusKm / earthRadiusKm);
+        double lonOffset = Math.toDegrees(radiusKm / (earthRadiusKm * Math.cos(Math.toRadians(lat))));
+
+        double minLat = lat - latOffset;
+        double maxLat = lat + latOffset;
+        double minLon = lon - lonOffset;
+        double maxLon = lon + lonOffset;
+
+        return new double[]{minLat, maxLat, minLon, maxLon};
     }
 
 }

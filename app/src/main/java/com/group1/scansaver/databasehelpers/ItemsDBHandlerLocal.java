@@ -80,15 +80,20 @@ public class ItemsDBHandlerLocal extends SQLiteOpenHelper {
         String name = item.getNAME();
         String upc = item.getUPC();
         double price = item.getPRICE();
+        String store = item.getITEM_LOCATION();
+        String imageUrl = item.getITEM_IMAGEURL();
 
         values.put(KEY_ITEM_NAME, name);
         values.put(KEY_ITEM_UPC, upc);
         values.put(KEY_ITEM_PRICE, price);
+        values.put(KEY_ITEM_STORE, store); // Adding store field
+        values.put(KEY_ITEM_IMAGEURL, imageUrl); // Adding image URL field
 
         long id = db.insert(TABLE_FAVOURITES, null, values);
         db.close();
         return id;
     }
+
 
     public int updateFavorite(int id ,Item item) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -111,9 +116,23 @@ public class ItemsDBHandlerLocal extends SQLiteOpenHelper {
         return rowsAffected;
     }
 
-    public void removeFavorite(String upc){
+    public boolean isFavorite(String upc) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT COUNT(*) FROM " + TABLE_FAVOURITES + " WHERE " + KEY_ITEM_UPC + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{upc});
+        boolean isFavorite = false;
+        if (cursor.moveToFirst()) {
+            isFavorite = cursor.getInt(0) > 0; // Check if count > 0
+        }
+        cursor.close();
+        db.close();
+        return isFavorite;
+    }
+
+    public void removeFavorite(String upc) {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_FAVOURITES, KEY_ITEM_UPC + " = ?", new String[]{String.valueOf(upc)});
+        db.delete(TABLE_FAVOURITES, KEY_ITEM_UPC + " = ?", new String[]{upc});
+        db.close();
     }
 
     public List<Item> getAllFavorites() {
@@ -129,8 +148,6 @@ public class ItemsDBHandlerLocal extends SQLiteOpenHelper {
                 // Create a new Item object
                 Item item = new Item();
 
-                //Populate the Item object with data from the cursor
-                //item.setID(cursor.getInt(cursor.getColumnIndex(KEY_FAV_ID)));
                 int nameIndex = cursor.getColumnIndex(KEY_ITEM_NAME);
                 if (nameIndex != -1) {
                     item.setNAME(cursor.getString(nameIndex));
@@ -145,10 +162,17 @@ public class ItemsDBHandlerLocal extends SQLiteOpenHelper {
                 if (priceIndex != -1) {
                     item.setPRICE(cursor.getDouble(priceIndex));
                 }
-                //item.setStore(cursor.getString(cursor.getColumnIndex(KEY_ITEM_STORE)));
-                //item.setImageURL(cursor.getString(cursor.getColumnIndex(KEY_ITEM_IMAGEURL)));
 
-                // Add the Item to the list
+                int storeIndex = cursor.getColumnIndex(KEY_ITEM_STORE);
+                if (storeIndex != -1) {
+                    item.setITEM_LOCATION(cursor.getString(storeIndex));
+                }
+
+                int imageUrlIndex = cursor.getColumnIndex(KEY_ITEM_IMAGEURL);
+                if (imageUrlIndex != -1) {
+                    item.setITEM_IMAGEURL(cursor.getString(imageUrlIndex));
+                }
+
                 itemList.add(item);
             }
             cursor.close();

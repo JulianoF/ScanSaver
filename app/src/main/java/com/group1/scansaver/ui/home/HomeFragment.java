@@ -1,11 +1,15 @@
 package com.group1.scansaver.ui.home;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -23,11 +27,18 @@ import com.group1.scansaver.databasehelpers.ItemsDBHandlerLocal;
 
 import com.group1.scansaver.dataobjects.Item;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class HomeFragment extends Fragment {
 
     private FragmentHomeBinding binding;
+    private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -73,13 +84,45 @@ public class HomeFragment extends Fragment {
                 ImageView itemIcon = itemCard.findViewById(R.id.imageView);
                 Button itemMapButton = itemCard.findViewById(R.id.viewOnMap);
                 Button deleteItemButton = itemCard.findViewById(R.id.deleteButton);
+                CheckBox favIcon = itemCard.findViewById(R.id.star);
+
+                favIcon.setChecked(true);
+                favIcon.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                    if (!isChecked) {
+                        favIcon.setChecked(true);
+                    }
+                });
 
                 itemName.setText(item.getNAME());
                 itemLowestPrice.setText("$" + item.getPRICE());
                 itemUPC.setText(item.getUPC());
 
+                String imgURL = item.getITEM_IMAGEURL();
+                String storeName = item.getITEM_LOCATION();
+
+                if(imgURL != null){
+                    if(!imgURL.isEmpty()|| imgURL.compareTo("N/A") != 0){
+
+                        executorService.execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    Bitmap bitmap = BitmapFactory.decodeStream((InputStream)new URL(item.getITEM_IMAGEURL()).getContent());
+                                    itemIcon.setImageBitmap(bitmap);
+                                } catch (MalformedURLException e) {
+                                    Log.e("IMGURL",e.getMessage());
+                                } catch (IOException e) {
+                                    Log.e("IMGURL",e.getMessage());
+                                }
+                            }
+
+                        });
+                    }
+                }else{Log.e("IMGURL","NULL URL");}
+
                 itemMapButton.setOnClickListener(v -> {
                     Intent intent = new Intent(getActivity(), MapActivity.class); // START MAP ACTIVITY SEND GEO DATA TO IT
+                    intent.putExtra("store_name", storeName);
                     startActivity(intent);
                 });
 
