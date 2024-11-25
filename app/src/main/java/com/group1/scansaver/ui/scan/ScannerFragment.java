@@ -263,7 +263,7 @@ public class ScannerFragment extends Fragment {
                         //bottomNavigationView.setSelectedItemId(R.id.navigation_dashboard);
 
                     }catch(Exception e){
-                        Toast.makeText(getContext(), "ITEM NOT FOUND IN API but barcode is:"+barcode, Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getContext(), "ITEM NOT FOUND IN API but barcode is:"+barcode, Toast.LENGTH_SHORT).show();
                         new Thread(() -> {
                             boolean exists = fs.doesItemExist(barcode);
                             if (exists) {

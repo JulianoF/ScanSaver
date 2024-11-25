@@ -49,7 +49,10 @@ public class HomeFragment extends Fragment {
 
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if(currentUser == null){
-            homeText.setText("Signed Out Home"); //WHAT YOU WANT USER TO SEE WHEN SIGNED OUT GOES HERE
+            homeText.setText("Sign in To View Home Page Favourites");
+            LinearLayout itemLayout = binding.scrollerInner;
+            itemLayout.removeAllViews();
+            //WHAT YOU WANT USER TO SEE WHEN SIGNED OUT GOES HERE
         }else{
             homeText.setText("Favourite Items"); //WHAT YOU WANT USER TO SEE WHEN SIGNED IN GOES HERE
             populateItemCards(inflater);
@@ -108,7 +111,7 @@ public class HomeFragment extends Fragment {
                             public void run() {
                                 try {
                                     Bitmap bitmap = BitmapFactory.decodeStream((InputStream)new URL(item.getITEM_IMAGEURL()).getContent());
-                                    itemIcon.setImageBitmap(bitmap);
+                                    requireActivity().runOnUiThread(() -> itemIcon.setImageBitmap(bitmap));
                                 } catch (MalformedURLException e) {
                                     Log.e("IMGURL",e.getMessage());
                                 } catch (IOException e) {
@@ -119,6 +122,7 @@ public class HomeFragment extends Fragment {
                         });
                     }
                 }else{Log.e("IMGURL","NULL URL");}
+
 
                 itemMapButton.setOnClickListener(v -> {
                     Intent intent = new Intent(getActivity(), MapActivity.class); // START MAP ACTIVITY SEND GEO DATA TO IT
