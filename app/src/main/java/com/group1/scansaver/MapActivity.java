@@ -2,6 +2,7 @@ package com.group1.scansaver;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -50,6 +51,14 @@ public class MapActivity extends AppCompatActivity {
 
         apiReq = new UPCApiRequest();
 
+        Intent intent = getIntent();
+        String storeName = intent.getStringExtra("store_name");
+        if(storeName == null || storeName.isEmpty()){
+            storeName = "McDonald's";
+        }else{
+
+        }
+
         // Initialize the MapView
         mapView = findViewById(R.id.mapView);
         mapView.setMultiTouchControls(true);
@@ -57,6 +66,7 @@ public class MapActivity extends AppCompatActivity {
         // Check for location permissions
         if (checkPermissions()) {
 
+            String finalStoreName = storeName;
             fusedLocationClient.getLastLocation()
                     .addOnSuccessListener(this, new OnSuccessListener<Location>() {
                         @Override
@@ -69,14 +79,14 @@ public class MapActivity extends AppCompatActivity {
                                 executorService.execute(new Runnable() {
                                     @Override
                                     public void run() {
-                                        List<double[]> coordinates = apiReq.getStoreLocations("Metro", location.getLatitude(), location.getLongitude());
+                                        List<double[]> coordinates = apiReq.getStoreLocations(finalStoreName, location.getLatitude(), location.getLongitude());
                                         runOnUiThread(new Runnable() {
                                             @Override
                                             public void run() {
                                                 if (!coordinates.isEmpty()) {
                                                     for (double[] cords : coordinates) {
                                                         GeoPoint storeLoc = new GeoPoint(cords[0], cords[1]);
-                                                        addMarker(storeLoc, "Metro");
+                                                        addMarker(storeLoc, finalStoreName);
                                                     }
                                                 } else {
                                                     Toast.makeText(MapActivity.this, "No store locations found", Toast.LENGTH_SHORT).show();
@@ -101,7 +111,6 @@ public class MapActivity extends AppCompatActivity {
     private void loadMap(double lat, double longi) {
 
 
-        // Set initial map zoom and location (example: New York City)
         GeoPoint startPoint = new GeoPoint(lat, longi);
         mapView.getController().setZoom(14.0);
         mapView.getController().setCenter(startPoint);

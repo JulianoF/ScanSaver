@@ -9,6 +9,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.group1.scansaver.SignUpActivity;
 import com.group1.scansaver.dataobjects.Item;
 
+import java.util.concurrent.CompletableFuture;
+
 public class FirestoreHandler {
 
     private FirebaseFirestore firestore;
@@ -42,6 +44,55 @@ public class FirestoreHandler {
                     });
         } else {
             Log.w("FIRE", "No user is currently signed in.");
+        }
+    }
+
+    public void deleteItemFromFirestore(String upc) {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            firestore.collection("items")
+                    .document(upc)
+                    .delete()
+                    .addOnSuccessListener(aVoid -> {
+                        Log.e("FIRE", "Item successfully deleted.");
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e("FIRE", "Failed to delete item", e);
+                    });
+        } else {
+            Log.w("FIRE", "No user is currently signed in.");
+        }
+    }
+
+    public boolean doesItemExist(String upc) {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            CompletableFuture<Boolean> future = new CompletableFuture<>();
+
+            firestore.collection("items")
+                    .document(upc)
+                    .get()
+                    .addOnSuccessListener(documentSnapshot -> {
+                        if (documentSnapshot.exists()) {
+                            future.complete(true);
+                        } else {
+                            future.complete(false);
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e("FIRE", "Error checking item existence", e);
+                        future.complete(false);
+                    });
+
+            try {
+                return future.get();
+            } catch (Exception e) {
+                Log.e("FIRE", "Error waiting for item check", e);
+                return false;
+            }
+        } else {
+            Log.w("FIRE", "No user is currently signed in.");
+            return false;
         }
     }
 

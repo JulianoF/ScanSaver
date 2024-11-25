@@ -76,7 +76,7 @@ public class Item {
         return this.ITEM_IMAGEURL;
     }
 
-    public void setITEM_IMAGEURL(){
+    public void setITEM_IMAGEURL(String ITEM_IMAGEURL){
         this.ITEM_IMAGEURL= ITEM_IMAGEURL;
     }
 }
