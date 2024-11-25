@@ -102,5 +102,76 @@ public class UPCApiRequest {
         }
     }
 
+    public List<double[]> getStoreLocations(String storeName, double userLat, double userLong) {
+        List<double[]> results = new ArrayList<>();
+        OkHttpClient client = new OkHttpClient();
+
+        double radiusKm = 20.0;
+
+        Log.e("API", "UserLat: "+userLat+" UserLong: "+userLong);
+        // Calculate the bounding box
+        double[] boundingBox = calculateBoundingBox(userLat, userLong, radiusKm);
+        String viewbox = boundingBox[0] + "," + boundingBox[1] + "," + boundingBox[2] + "," + boundingBox[3];
+
+        String bounded = "1"; // Limit results to the specified bounding box
+        String countryCode = "ca"; // Canada
+
+        String url = "https://nominatim.openstreetmap.org/search?q=" + storeName +
+                "&format=json&addressdetails=1&viewbox=" + viewbox + "&bounded=" + bounded +
+                "&lat=" + userLat + "&lon=" + userLong +
+                "&countrycodes=" + countryCode;
+
+        Request request = new Request.Builder()
+                .url(url)
+                .addHeader("User-Agent", "ScanSaver/1.0 (juliano1@live.ca)")
+                .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            if (response.isSuccessful()) {
+                String jsonData = response.body().string();
+                Log.e("API Response", jsonData);
+                JSONArray jsonArray = new JSONArray(jsonData);
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject location = jsonArray.getJSONObject(i);
+                    double latitude = location.getDouble("lat");
+                    double longitude = location.getDouble("lon");
+
+                    results.add(new double[]{latitude, longitude});
+                }
+            } else {
+                Log.e("API", "Failed API call");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return results;
+    }
+
+
+    private double[] calculateBoundingBox(double lat, double lon, double radiusKm) {
+        final double earthRadiusKm = 6371.1370;
+
+        double latOffset = Math.toDegrees(radiusKm / earthRadiusKm);
+        double lonOffset = Math.toDegrees(radiusKm / (earthRadiusKm * Math.cos(Math.toRadians(lat))));
+
+        double minLat = lat - latOffset;
+        double maxLat = lat + latOffset;
+        double minLon = lon - lonOffset;
+        double maxLon = lon + lonOffset;
+
+        return new double[]{minLat, maxLat, minLon, maxLon};
+    }
+
+    public static double haversine(double lat1, double lon1, double lat2, double lon2) {
+        final int R = 6371; // Radius of the Earth in km
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c; // Distance in km
+    }
+
 }
 

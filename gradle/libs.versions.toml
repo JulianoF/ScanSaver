@@ -19,6 +19,7 @@ cameraCore = "1.4.0"
 firebaseCrashlyticsBuildtools = "3.0.2"
 cameraLifecycle = "1.4.0"
 cameraView = "1.4.0"
+playServicesLocation = "21.3.0"
 
 [libraries]
 androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "cameraCoreVersion" }
@@ -41,6 +42,7 @@ camera-core = { group = "androidx.camera", name = "camera-core", version.ref = "
 firebase-crashlytics-buildtools = { group = "com.google.firebase", name = "firebase-crashlytics-buildtools", version.ref = "firebaseCrashlyticsBuildtools" }
 camera-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", version.ref = "cameraLifecycle" }
 camera-view = { group = "androidx.camera", name = "camera-view", version.ref = "cameraView" }
+play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
