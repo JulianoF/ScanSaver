@@ -2,6 +2,8 @@ package com.group1.scansaver.api;
 
 import android.util.Log;
 
+import com.group1.scansaver.BuildConfig;
+
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -31,7 +33,7 @@ public class UPCApiRequest {
         OkHttpClient client = new OkHttpClient();
 
         // NOT REAL KEY, KEY MUST GO IN SAFE SPACE
-        String API_KEY = "18614A16819D1B04A4DCBCC1D3B2DA18"; // API KEY
+        String API_KEY = BuildConfig.API_KEY; // API KEY
 
         Request request = new Request.Builder()
                 .url(API_URL+"?apikey="+API_KEY)

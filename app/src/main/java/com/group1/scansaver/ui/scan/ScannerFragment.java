@@ -259,18 +259,11 @@ public class ScannerFragment extends Fragment {
                         Item newItem = new Item(title,barcodeAPI,Double.parseDouble(msrp),store,imgURL);
                         fs.insertItemIntoFirestore(newItem);
 
-                        //BottomNavigationView bottomNavigationView = getActivity().findViewById(R.id.nav_view);///////////////
-                        //bottomNavigationView.setSelectedItemId(R.id.navigation_dashboard);
-
                     }catch(Exception e){
-                        //Toast.makeText(getContext(), "ITEM NOT FOUND IN API but barcode is:"+barcode, Toast.LENGTH_SHORT).show();
                         new Thread(() -> {
                             boolean exists = fs.doesItemExist(barcode);
                             if (exists) {
                                 Log.d("ITEM_CHECK", "Item exists in Firestore.");
-
-                               // BottomNavigationView bottomNavigationView = getActivity().findViewById(R.id.nav_view);///////////////
-                                //bottomNavigationView.setSelectedItemId(R.id.navigation_dashboard);
 
                             } else {
                                 Log.d("ITEM_CHECK", "Item does not exist in Firestore.");
@@ -285,11 +278,7 @@ public class ScannerFragment extends Fragment {
                 });
             }
             @Override
-            public void onError(String error) {
-                //requireActivity().runOnUiThread(() -> {
-
-                //});
-            }
+            public void onError(String error) {}
         });
 
     }

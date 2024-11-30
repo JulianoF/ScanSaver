@@ -1,7 +1,17 @@
+import java.util.Properties
+import java.io.FileInputStream
+
+val apikeyPropertiesFile = rootProject.file("apikey.properties")
+val apikeyProperties = Properties().apply {
+    load(FileInputStream(apikeyPropertiesFile))
+}
+
 plugins {
     alias(libs.plugins.android.application)
     id("com.google.gms.google-services")
 }
+
+
 
 android {
     namespace = "com.group1.scansaver"
@@ -33,6 +43,16 @@ android {
     buildFeatures {
         viewBinding = true
         buildConfig = true
+    }
+
+    defaultConfig {
+
+        buildConfigField(
+            "String",
+            "API_KEY",
+            "\"${apikeyProperties["API_KEY"]}\""
+        )
+
     }
 }
 

@@ -72,7 +72,7 @@ public class AddItemActivity extends AppCompatActivity {
                 inputURL.getText().toString());
 
         FirestoreHandler database = new FirestoreHandler();
-        //UNCOMMENT THIS FOR ITEMS TO BE SAVED TO DB
+        //THIS FOR ITEMS TO BE SAVED TO DB
         database.insertItemIntoFirestore(savedItem);
     }
 }

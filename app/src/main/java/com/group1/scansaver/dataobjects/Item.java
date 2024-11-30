@@ -1,8 +1,5 @@
 package com.group1.scansaver.dataobjects;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Item {
 
     private String ITEM_UPC;

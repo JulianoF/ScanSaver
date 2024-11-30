@@ -48,7 +48,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void onClickForgot(View v){
-        Toast.makeText(this, "You forgot Psssword Clicked",
+        Toast.makeText(this, "Forgot Password Clicked Impl in Future",
                 Toast.LENGTH_LONG).show();
     }
 

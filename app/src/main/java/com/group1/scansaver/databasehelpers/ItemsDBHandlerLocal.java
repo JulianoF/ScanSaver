@@ -51,7 +51,7 @@ public class ItemsDBHandlerLocal extends SQLiteOpenHelper {
 
         db.execSQL(CREATE_NOTES_TABLE);
 
-        String CREATE_COORDINATES_TABLE = "CREATE TABLE " + TABLE_COORDINATES +
+        String CREATE_COORDINATES_TABLE = "CREATE TABLE " + TABLE_COORDINATES + // THIS TABLE IS CURRENTLY UNUSED
                 "(" +
                 KEY_COORD_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                 KEY_ITEM_ID + " INTEGER," +
