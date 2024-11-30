@@ -51,14 +51,10 @@ public class MapActivity extends AppCompatActivity {
         // Load OSMDroid configuration
         Configuration.getInstance().load(getApplicationContext(), getSharedPreferences("prefs", MODE_PRIVATE));
 
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-
-        apiReq = new UPCApiRequest();
-
         Intent intent = getIntent();
         String storeName = intent.getStringExtra("store_name");
         if(storeName == null || storeName.isEmpty()){
-            storeName = "McDonald's";
+            storeName = "";
         }else{
 
         }
@@ -69,6 +65,9 @@ public class MapActivity extends AppCompatActivity {
 
         // Check for location permissions
         if (checkPermissions()) {
+
+            fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+            apiReq = new UPCApiRequest();
 
             String finalStoreName = storeName;
             fusedLocationClient.getLastLocation()
